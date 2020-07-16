@@ -1,0 +1,15 @@
+{
+  "contents": [{
+    "fileref": "ModelContentFile0",
+    "name": "default"
+  }],
+  "lastDate": "1594868210939",
+  "owner": "vtbaadmin",
+  "properties": {
+    "_RESOURCE_Description": "Description of New Modelsd",
+    "_RESOURCE_Type": "pyjm",
+    "__references__": "",
+    "modelStatus": "valid",
+    "name": "anomaly_detector"
+  }
+}

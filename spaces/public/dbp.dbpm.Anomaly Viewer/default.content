@@ -1,0 +1,104 @@
+<DashboardPluginModel description="Description of New Model 0" name="Anomaly Viewer" is_init="false">
+  <ModelInfo validated="true">
+    <Properties>
+    </Properties>
+    <Widgets>
+      <Widget name="AnomalyViewerRenderer" private="false">
+        <PropertyText>
+          <![CDATA[[]]]>
+        </PropertyText>
+        <CodeText segment="#onNotify">
+          <![CDATA[            if(evt.data) {
+                this.pngFile.setAttribute("src", "data:image/png;base64," + evt.data);
+                var self = this;
+                setTimeout(function() {
+                    self._onZoomSelectChange(null);
+                },10);
+            }]]>
+        </CodeText>
+        <CodeText segment="#buildRendering">
+          <![CDATA[            
+            var wrapper = domConstruct.create("div", {
+                style: "width:100%;height:100%;"
+            });
+            var img = domConstruct.create("img", {
+            });
+            domStyle.set(this.domNode, {"overflow": "auto"});
+            this.domNode.appendChild(wrapper);
+            wrapper.appendChild(img);
+            this.pngFile = img;
+            this.wrapper = wrapper;
+            this.zoomSelect.set("value","FitHorizontal",false);
+            ]]>
+        </CodeText>
+        <CodeText segment="#methods">
+          <![CDATA[        fitHorizontal: function() {
+            var viewerBox = domGeom.getContentBox(this.domNode);
+            var contentBox = domGeom.getContentBox(this.pngFile);
+            if (contentBox.w == 0) {
+                return;
+            }
+            var scale = viewerBox.w / contentBox.w;
+            //var transform_scale = "scale(" + scale +"," + scale + ")";
+            //domStyle.set(this.pngFile, {"transform": transform_scale,"transform-origin":"0 0"});
+            domStyle.set(this.wrapper, {"width": contentBox.w + "px", "height": contentBox.h + "px", "zoom": scale});
+            domStyle.set(this.domNode, {"overflow-y": "auto" , "overflow-x": "hidden"});
+        },
+        
+        fitAll: function() {
+            var viewerBox = domGeom.getContentBox(this.domNode);
+            var contentBox = domGeom.getContentBox(this.pngFile);
+            if (contentBox.w == 0 || contentBox.h == 0) {
+                return;
+            }
+            var scaleX = viewerBox.w / contentBox.w;
+            var scaleY = viewerBox.h / contentBox.h;
+            domStyle.set(this.wrapper, {"width": contentBox.w + "px", "height": contentBox.h + "px", "zoom": Math.min(scaleX,scaleY)});
+            domStyle.set(this.domNode, {"overflow": "hidden"});
+        },
+        
+        resetZoom:function() {
+            var contentBox = domGeom.getContentBox(this.pngFile);
+            domStyle.set(this.wrapper, {"width": contentBox.w + "px", "height": contentBox.h + "px", "zoom":""});
+            domStyle.set(this.domNode, {"overflow": "auto"});
+        },
+        
+        _onZoomSelectChange: function(evt) {
+            var selected = this.zoomSelect.get("value");
+            if (selected == "FitHorizontal") {
+                this.fitHorizontal();
+            } else if (selected == "FitAll") {
+                this.fitAll();
+            } else {
+                this.resetZoom()
+            }
+        }
+        ]]>
+        </CodeText>
+        <CodeText segment="#updateWidthAndHeight">
+          <![CDATA[            this._onZoomSelectChange(null);]]>
+        </CodeText>
+        <HtmlText>
+          <![CDATA[<div style="width:100%;height:100%;">
+	<select dojoAttachPoint="zoomSelect" dojoType="dijit.form.Select" 
+        dojoAttachEvent="onChange:_onZoomSelectChange"
+        style="position:absolute;top:2px;right:5px;z-index:999;width:160px;">
+        <option value="FitHorizontal">Fit to horizontal space</option>
+        <option value="FitAll">Fit to space</option>
+        <option value="Original">Original</option>
+    </select>
+</div>
+]]>
+        </HtmlText>
+      </Widget>
+    </Widgets>
+    <Functions>
+    </Functions>
+    <Services>
+    </Services>
+    <Resources>
+    </Resources>
+    <Plugins>
+    </Plugins>
+  </ModelInfo>
+</DashboardPluginModel>

@@ -1,0 +1,72 @@
+<PythonJobModel description="Description of New Modelsd" name="anomaly_detector" autoStart="true" is_init="false">
+  <ModelInfo validated="true">
+    <Properties><![CDATA[
+{
+  "pythonCommand": "python %%",
+  "runningMode": "rpc",
+  "libraries": [
+    {
+      "_id": "897469b4-5c71-4787-8448-f9562cf214ae",
+      "name": "pandas",
+      "version": ""
+    },
+    {
+      "_id": "2a89f249-021e-4bfe-8645-12b4afb05178",
+      "name": "numpy",
+      "version": ""
+    },
+    {
+      "_id": "701a3e59-4f28-469a-847e-a52f9b457f05",
+      "name": "matplotlib",
+      "version": ""
+    },
+    {
+      "_id": "a7a01af4-d7d9-4090-8e4c-601591705fe4",
+      "name": "pyhive",
+      "version": ""
+    },
+    {
+      "_id": "a371618e-2e71-4b58-87f1-5964f6895822",
+      "name": "thrift",
+      "version": ""
+    }
+  ],
+  "environments": [],
+  "properties": [
+    {
+      "type": "string",
+      "editorType": "textInput",
+      "name": "hiveHost",
+      "label": "hiveHost",
+      "value": "10.101.7.163"
+    },
+    {
+      "type": "string",
+      "editorType": "textInput",
+      "name": "hivePort",
+      "label": "hivePort",
+      "value": "7001"
+    }
+  ]
+}
+    ]]></Properties>
+    <Main><![CDATA[
+{
+  "imports": "import pandas as pd\nimport numpy as np\nimport sys\nimport matplotlib \nmatplotlib.use('Agg') \nfrom matplotlib import pyplot as plt\n#import matplotlib.pyplot as plt\nimport matplotlib.dates as md\nimport time\nimport datetime\nfrom matplotlib.backends.backend_pdf import PdfPages\nfrom pyhive import hive\nimport itertools\n\nfrom collections import OrderedDict\nfrom datetime import datetime, timedelta\nfrom numpy.random import randint\nfrom numpy import percentile\nimport base64\n\nhours_offset = 1  # from PDT to MDT\n# a_tbl_name = \"viaml_video_anomaly\"\na_tbl_name = \"viaml_metric_history\"\np_tbl_name = \"viaml_percentile\"\nparam_result_master=None\n\nmetrics = ['Stat Login Attempts','Stat Login Failures','Failed Stream Start','Failing Streams']\nchart_ylim = {}\n",
+  "main": "        \n        saveVariable(\"NameServer\", domainProperties.get(\"pyro.name.server\"));\n        ",
+  "__otherMethods__": "    \n    #Query Anomlay Table\n\n    #Query Anomlay Table\n    def anomaly_query(self, conn, metric,start_date, end_date,level=\"metric\"):\n        if level == \"metric\":\n            sql = \"select from_unixtime(end_tm) ts, if(aggr_metric >= 0.8*(b.upper_pct - b.middle_pct) + baseline_median,1,0) `\"  + metric +\"_anomaly`, \"+ \"baseline_median `\"+ metric +\"_median`, \"+ \"((aggr_metric - baseline_median)/b.upper_pct) `\" + metric + \"_value`, \"+ \"deviation as `\"+ metric + \"` \" + \"from \" + a_tbl_name + \" a \"+ \"join \" + p_tbl_name + \" b on (a.metric=b.metric and a.dim_keys=b.dim_keys and a.dim_values=b.dim_values) \" + \"where a.service='Video-5min' and b.service='Video-5min' and algorithm='baseline' \" +  \"and a.metric= 'Quantum|\" + metric + \"' and a.dim_keys='' \" + \"and a.date_key >= \" + str(start_date) + \" and a.date_key <= \" + str(end_date)\n            print(sql)\n            result = pd.read_sql(sql, conn)\n            result['ts'] = pd.to_datetime(result['ts'])\n            return result\n        else:\n            sql = (\"select from_unixtime(end_tm) ts, aggr_metric metricvalue,baseline_median median, \"+            \"if(aggr_metric >= 1*(b.upper_pct - b.middle_pct) + baseline_median,1,0) c_anomaly \"+            \"from \"+a_tbl_name+\" a \"+            \"join \"+p_tbl_name+\" b on (a.metric=b.metric and a.dim_keys=b.dim_keys and a.dim_values=b.dim_values) \" +            \"where  a.service='Video-Call-5min' and b.service='Video-Call-5min' and a.metric in ('Video','*|Customer Call Volume') and b.metric='*|Customer Call Volume' \"+            \"and a.dim_keys='' and a.date_key >= \"+str(start_date)+\" and a.date_key <= \"+str(end_date))\n            print(sql)\n            result = pd.read_sql(sql, conn)\n            result['ts'] = pd.to_datetime(result['ts'])\n            return result\n\n    def plotTrend_24hrs_axis_history(self, imageMap, calls, date1,size, _figsize=(20,2), _width=2):\n        days = matplotlib.dates.HourLocator()\n        yearsFmt = matplotlib.dates.DateFormatter(\"%H\")\n        chart_size = 5 # 1 customer cals + len(metrics)\n        for m in range(0,size):\n            if(m%(chart_size-1))==0:\n                fig,ax = plt.subplots(chart_size,1,  figsize=(40,25))\n                k=0\n                calls[\"metricvalue\"] = calls[\"metricvalue\"].fillna(0)\n                calls[\"median\"] = calls[\"median\"].fillna(0)\n                calls['c_anomaly'] = calls['c_anomaly'].replace({ 0:np.nan})\n                \n                ax[k].set_title(\" Customer calls\")\n                ax[k].plot(calls['ts'].tolist(), calls['metricvalue'].tolist(), linewidth=_width, alpha=0.5)\n                ax[k].plot(calls['ts'].tolist(), calls['median'].tolist(), linewidth=_width/2)\n                ax[k].scatter(calls['ts'].tolist(), calls[\"c_anomaly\"]*(100)*0.8 ,c=\"black\")\n    \n                ax[k].xaxis.set_major_locator(days)\n                ax[k].xaxis.set_major_formatter(yearsFmt)\n                ax[k].grid(which='major')\n                ax[k].set_anchor('S')\n    \n                ax[k].set_ylim([0,100+10])\n    \n                k =1\n    \n                for n in range(m,m+(chart_size-1)):\n                    if(n<size):\n                        metric = metrics[n]\n                        j = chart_ylim[metric]\n                        \n                        if \"m_metricvalue_\"+metric in calls.columns:\n                            calls[\"m_metricvalue_\"+metric] = calls[\"m_metricvalue_\"+metric].fillna(0)\n                            ax[k].plot(calls['ts'].tolist(), calls[\"m_metricvalue_\"+metric].tolist(), linewidth=_width, alpha=0.5)\n                        if \"m_median_\"+metric in calls.columns:\n                            calls[\"m_median_\"+metric] = calls[\"m_median_\"+metric].fillna(0)\n                            ax[k].plot(calls['ts'].tolist(), calls[\"m_median_\"+metric].tolist(), linewidth=_width/2)\n    \n                        ax[k].xaxis.set_major_locator(days)\n                        ax[k].xaxis.set_major_formatter(yearsFmt)\n                        ax[k].grid(which='major')\n                        if \"m_anomaly_\"+metric in calls.columns:\n                            calls[\"m_anomaly_\"+metric] = calls[\"m_anomaly_\"+metric].replace({ 0:np.nan})\n                            ax[k].scatter(calls['ts'].tolist(), calls[\"m_anomaly_\"+metric]*(j)*0.8 ,c=\"black\")\n                        ax[k].set_anchor('S')\n                        ax[k].set_ylim([0,j])\n                        ax[k].set_title(metric)\n                        k = k + 1\n                fig.suptitle(\"Date - \"+str(date1)+\", Axis fmt - HH, Local tz\")\n                \n                key = str(date1)+'-'+str(m+1)+'.png'\n                pngPath = self.vtGetOutputFolder() + key\n                plt.tight_layout()\n                plt.savefig(pngPath)\n                plt.close()\n                print(\"write file \" + pngPath, flush = True)\n                with open(pngPath, \"rb\") as image_file:\n                    encoded_string = base64.b64encode(image_file.read()).decode('ascii')\n                    imageMap[key] = encoded_string\n                    print(\"store file \" + key + \" to result\", flush = True)\n    \n    def _daterange(self, start_date, end_date):\n        from datetime import timedelta, date\n        for n in range(int ((end_date - start_date).days)):\n            yield start_date + timedelta(n)\n            \n    def detect(self, param_start_date = \"20190101\", param_end_date = \"20190105\"):\n        print(\"---> detect (\" + str(param_start_date) + \", \" + str(param_end_date) +\")\", flush=True) \n        hiveHost = self.props.get(\"hiveHost\")\n        hivePort = self.props.get(\"hivePort\")\n        self.conn = hive.Connection(host=hiveHost, port=int(hivePort), username=\"vitria\",auth='NOSASL')\n        conn = self.conn\n        for metric in metrics:\n            result_reg = self.anomaly_query(conn, metric,param_start_date,param_end_date,\"metric\")\n            result_reg['m_anomaly_'+metric] = result_reg[metric+\"_anomaly\"]\n            result_reg['m_metricvalue_'+metric] = result_reg[metric+\"_value\"]\n            result_reg[\"m_median_\"+metric] = 0\n            result_reg['ts'] = pd.to_datetime(result_reg['ts'])\n            chart_ylim[metric] = result_reg[metric+\"_value\"].quantile(0.98)\n            if param_result_master is not None:\n                result_master = pd.merge(param_result_master,result_reg,on=\"ts\",how=\"left\")\n            else:\n                result_master = result_reg\n\n        result_ref = self.anomaly_query(conn, \"calls\",param_start_date, param_end_date,\"calls\")\n        result_master = pd.merge(result_master, result_ref,on=\"ts\",how=\"left\")\n        result_master[\"date\"] = result_master.ts.dt.strftime(\"%Y%m%d\")\n        \n        from datetime import timedelta, date\n        sd = str(param_start_date)\n        ed = str(param_end_date)\n        start_date = date(int(sd[0:4]),int(sd[4:6]), int(sd[6:8]))\n        end_date =   date(int(ed[0:4]),int(ed[4:6]), int(ed[6:8]))\n        result = {}\n        for single_date in self._daterange(start_date, end_date):\n            date1 = single_date.strftime(\"%Y%m%d\")\n            plot_df = result_master[(result_master['date'] == date1)]\n        \n            if not plot_df.empty:\n                plot_df = plot_df.sort_values(by=['ts']) \n                self.plotTrend_24hrs_axis_history(result, plot_df,date1,len(metrics))\n        return result\n    \n    def sayHello(self, message):\n        return \"Hello, \" + message\n    \n    def vtListOutputFiles(self):\n        rootFolder = self.vtGetOutputFolder(self)\n        return os.listdir(rootFolder)\n    ",
+  "__init__": "        ",
+  "annotation": "saveVariable(\"EnableOutputMonitoring\", \"true\")\n"
+}
+    ]]></Main>
+    <Files><![CDATA[
+[]
+    ]]></Files>
+    <Dependencies><![CDATA[
+{
+  "libraries": [],
+  "services": []
+}
+    ]]></Dependencies>
+  </ModelInfo>
+</PythonJobModel>
