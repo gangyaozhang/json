@@ -1,0 +1,21 @@
+<SparkModuleModel description="this is a adf sdk model test" name="adfsdk1" is_init="false">
+  <ModelInfo validated="true">
+    <Module><![CDATA[{"desc":"this is a adf sdk model test","icon":"","version":"","backupDir":"","components":""}]]></Module>
+    <Files><![CDATA[[]]]></Files>
+    <Blocks>
+      <Block name="MyBlock" label="MyBlock"  enabled="true">
+        <Meta><![CDATA[{"name":"MyBlock","label":"MyBlock","desc":"","group":"Transform","displayOrder":1000,"image":"","inputMinCount":1,"inputMaxCount":1,"outputMinCount":1,"outputMaxCount":1,"acceptedSourceTypes":["RDD","DStream","DataFrame"],"outputType":"*","libraries":""}]]></Meta>
+        <Properties><![CDATA[[{"name":"property","label":"Input","type":"string","editorType":"textInput","group":"common","*":{"label":"label","desc":"desc"}},{"name":"property1","label":"Text","type":"string","constraints":{"type":"textArea","args":{"rows":"4","itemStyle":"height: auto;"}},"editorType":"textArea","group":"common","*":{"label":"label","desc":"desc"}}]]]></Properties>
+        <Controller>
+        </Controller>
+        <Generator type="undefined">
+          <Template>
+          </Template>
+        </Generator>
+        <I18N><![CDATA[{"default":{"block.label":"MyBlock","block.desc":"","property.property.label":"Input","property.property1.label":"Text"}}]]></I18N>
+      </Block>
+    </Blocks>
+    <UDFs>
+    </UDFs>
+  </ModelInfo>
+</SparkModuleModel>

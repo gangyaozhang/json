@@ -1,0 +1,82 @@
+<DataPipeModel description="Description of New Model 0" name="adf1" editBy="flow" is_init="false" useStreaming="auto" durableStreaming="false" streamingAutoStart="true" useHive="auto" batchDuration="P1M" runAsService="false" checkpoint="" batchSampling="true" sparkMasterHost="local[*]">
+  <HiveConfig>
+    <Properties>
+      <Property name="hive.warehouse.hdfs.source" value="hdfs"/>
+      <Property name="hive.metastore.data.source" value="defaultds"/>
+      <Property name="hive.server2.thrift.port" value=""/>
+      <Property name="hive.db.schema" value=""/>
+    </Properties>
+  </HiveConfig>
+  <ModelInfo validated="true">
+    <Pipes>
+      <Pipe index="1000" uuid="" name="(main)">
+      </Pipe>
+    </Pipes>
+    <Flows>
+      <Flow index="1000" uuid="Main" isNested="false" revision="21" name="Main" showFooter="true">
+        <Node index="1002" uuid="d44a11ac-bf76-4630-8414-c49e128a7513" type="StreamSource" label="redfile" x="190" y="20" width="130" height="75">
+            <Output name="Out1" uid="0" outputType="DStream" dataType="String">
+              <Field name="data" label="data" type="string" isArray="false" isOptional="false"/>
+                <ExploreConfig>{&quot;_index&quot;:&quot;Default&quot;,&quot;items&quot;:[{&quot;name&quot;:&quot;Default&quot;}]}</ExploreConfig>
+            </Output>
+            <Model type="textFileStream" url="d:\\new.txt" nameFilter="" include="true" initialOffset="earliest" maxFileSizeInUnit="-1" maxFileSizeUnit="mb" maxFileSize="-1" speficiedStartPosition="false" isOutputFileName="false" isSkipFirstLine="true" dataSpeed="" dataVolume="">
+              <Sample><![CDATA[1,zhang,beijing
+2,wang,shanghai
+3,li,tianjin]]></Sample>
+            </Model>
+        </Node>
+        <Node index="1001" uuid="201eec9b-adf1-464b-887d-b74b2e137157" type="Parse" label="Step 1" x="360" y="25" width="130" height="75">
+            <Source name="source" uid="0" outputType="DStream" dataType="String">
+              <DataSource category="#OUTPUT" id="undefined" name="Out1" nodeId="d44a11ac-bf76-4630-8414-c49e128a7513">
+                <Field name="data" label="data" type="string" isDimension="false" isMeasure="false" isArray="false" isOptional="false"/>
+              </DataSource>
+            </Source>
+            <Output name="Out1" uid="0" outputType="DStream" dataType="class:Step1_Class">
+              <Field name="id" label="id" type="integer" isArray="false" isOptional="true"/>
+              <Field name="name" label="name" type="string" isArray="false" isOptional="false"/>
+              <Field name="address" label="address" type="string" isArray="false" isOptional="false"/>
+                <ExploreConfig>{&quot;_index&quot;:&quot;Default&quot;,&quot;items&quot;:[{&quot;name&quot;:&quot;Default&quot;}]}</ExploreConfig>
+            </Output>
+            <Output name="Dropped" uid="1" outputType="DStream" dataType="(String,String)">
+              <Field name="___error___" label="error" type="string" isArray="false" isOptional="false"/>
+              <Field name="data" label="data" type="string" isArray="false" isOptional="false"/>
+                <ExploreConfig>{&quot;_index&quot;:&quot;Default&quot;,&quot;items&quot;:[{&quot;name&quot;:&quot;Default&quot;}]}</ExploreConfig>
+            </Output>
+            <Model format="csv" delimiterType="csv" caseClass="Step1_Class" isClassRef="false" fromHeader="true" addable="false" dropEvent="true" header="1,zhang,beijing" timezone="Asia/Shanghai" daylight="false">
+              <Schema>
+                <Field name="id" initName="1" label="id" type="integer" isDimension="false" isMeasure="false" isArray="false" isOptional="true" excluded="false"/>
+                <Field name="name" initName="zhang" label="name" type="string" isDimension="false" isMeasure="false" isArray="false" isOptional="false" excluded="false"/>
+                <Field name="address" initName="beijing" label="address" type="string" isDimension="false" isMeasure="false" isArray="false" isOptional="false" excluded="false"/>
+              </Schema>
+            </Model>
+        </Node>
+        <Node index="1003" uuid="ac6a56bb-7be7-4040-81a6-3c4c31207176" type="StreamTarget" label="Step 2" x="586" y="24" width="130" height="75">
+            <Source name="source" uid="0" outputType="DStream" dataType="class:Step1_Class">
+              <DataSource category="#OUTPUT" id="undefined" name="Out1" nodeId="201eec9b-adf1-464b-887d-b74b2e137157">
+                <Field name="id" label="id" type="integer" isDimension="false" isMeasure="false" isArray="false" isOptional="true"/>
+                <Field name="name" label="name" type="string" isDimension="false" isMeasure="false" isArray="false" isOptional="false"/>
+                <Field name="address" label="address" type="string" isDimension="false" isMeasure="false" isArray="false" isOptional="false"/>
+              </DataSource>
+            </Source>
+            <Output name="out" uid="0" outputType="DStream" dataType="class:Step1_Class">
+              <Field name="id" label="id" type="integer" isArray="false" isOptional="true"/>
+              <Field name="name" label="name" type="string" isArray="false" isOptional="false"/>
+              <Field name="address" label="address" type="string" isArray="false" isOptional="false"/>
+            </Output>
+            <Model type="file" url="d:\\old.txt" namePrefix="" format="json" partitionNum="0" dataSpeed="" dataVolume="">
+            </Model>
+        </Node>
+        <Link srcId="d44a11ac-bf76-4630-8414-c49e128a7513" srcPort="dout:0" tgtId="201eec9b-adf1-464b-887d-b74b2e137157" tgtPort="in:0"/>
+        <Link srcId="201eec9b-adf1-464b-887d-b74b2e137157" srcPort="dout:0" tgtId="ac6a56bb-7be7-4040-81a6-3c4c31207176" tgtPort="in:0"/>
+      <Codes>
+      </Codes>
+      <Libraries>
+          <Lib scope="system" systemPath="D:\Vitria\mysql.jar"/>
+      </Libraries>
+      <Resources>
+      </Resources>
+      <Properties>[]</Properties>
+      </Flow>
+    </Flows>
+  </ModelInfo>
+</DataPipeModel>

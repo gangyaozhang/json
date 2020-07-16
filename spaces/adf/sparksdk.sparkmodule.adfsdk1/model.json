@@ -1,0 +1,15 @@
+{
+  "contents": [{
+    "fileref": "ModelContentFile0",
+    "name": "default"
+  }],
+  "lastDate": "1594862354413",
+  "owner": "vtbaadmin",
+  "properties": {
+    "_RESOURCE_Description": "this is a adf sdk model test",
+    "_RESOURCE_Type": "sparkmodule",
+    "__references__": "",
+    "modelStatus": "valid",
+    "name": "adfsdk1"
+  }
+}
