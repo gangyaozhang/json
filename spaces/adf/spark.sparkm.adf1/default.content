@@ -1,4 +1,4 @@
-<DataPipeModel description="Description of New Model 0" name="adf1" editBy="flow" is_init="false" useStreaming="auto" durableStreaming="false" streamingAutoStart="true" useHive="auto" batchDuration="P1M" runAsService="false" checkpoint="" batchSampling="true" sparkMasterHost="local[*]">
+<DataPipeModel description="diff1" name="adf1" editBy="flow" is_init="false" useStreaming="auto" durableStreaming="false" streamingAutoStart="true" useHive="auto" batchDuration="P1M" runAsService="false" checkpoint="" batchSampling="true" sparkMasterHost="local[*]">
   <HiveConfig>
     <Properties>
       <Property name="hive.warehouse.hdfs.source" value="hdfs"/>
