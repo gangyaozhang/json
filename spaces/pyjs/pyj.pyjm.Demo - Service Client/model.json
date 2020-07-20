@@ -1,0 +1,15 @@
+{
+  "contents": [{
+    "fileref": "ModelContentFile0",
+    "name": "default"
+  }],
+  "lastDate": "1594869482297",
+  "owner": "vtbaadmin",
+  "properties": {
+    "_RESOURCE_Description": "Description of New Modeldasa",
+    "_RESOURCE_Type": "pyjm",
+    "__references__": "/app/pyj/space/pyjs/pyjm/Demo - Service",
+    "modelStatus": "valid",
+    "name": "Demo - Service Client"
+  }
+}

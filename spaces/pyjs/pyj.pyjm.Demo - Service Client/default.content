@@ -1,0 +1,17 @@
+<PythonJobModel is_init="false" autoStart="true" name="Demo - Service Client" description="Description of New Modeldasa"><ModelInfo validated="true"><Properties><![CDATA[
+{
+  "pythonCommand": "python %%",
+  "pipCommand": "pip install -r %%",
+  "runningMode": "rpc",
+  "rpcPort": "0",
+  "libraries": [],
+  "environments": [],
+  "properties": []
+}
+    ]]></Properties><Main><![CDATA[
+{
+  "__otherMethods__": "    def process(self, message=\"\"):\n        print(\"---> process (\"+message+\")\")\n        uri = self.vtLookup(\"Demo - Service\", \"*\")\n        result = None\n        with Pyro4.Proxy(uri) as proxy:\n            res = proxy.process(message)\n            result = res\n        print(result)    \n        print(\"process --->\")\n        return result\n        "
+}
+    ]]></Main><Files><![CDATA[
+[]
+    ]]></Files><Dependencies><![CDATA[{"libraries":[],"services":[{"uuid":"5d52dd34-d51d-414d-883f-08e2af21a68d","name":"Demo - Service"}]}]]></Dependencies></ModelInfo></PythonJobModel>

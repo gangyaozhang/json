@@ -1,0 +1,37 @@
+<PythonJobModel description="Description of New Model 0" name="Demo - Service" autoStart="true" is_init="false">
+  <ModelInfo validated="true">
+    <Properties><![CDATA[
+{
+  "pythonCommand": "python %%",
+  "pipCommand": "pip install -r %%",
+  "runningMode": "rpc",
+  "rpcPort": "0",
+  "libraries": [],
+  "environments": [],
+  "properties": [
+    {
+      "type": "string",
+      "editorType": "textInput",
+      "name": "whoami",
+      "label": "ID",
+      "value": "service1"
+    }
+  ]
+}
+    ]]></Properties>
+    <Main><![CDATA[
+{
+  "__otherMethods__": "    def process(self, message=\"\"):\n        print(\"Receive: \" + message)\n        return str(self.props.get(\"whoami\")) + \" received \\\"\" + message + \"\\\"!\"\n    "
+}
+    ]]></Main>
+    <Files><![CDATA[
+[]
+    ]]></Files>
+    <Dependencies><![CDATA[
+{
+  "libraries": [],
+  "services": []
+}
+    ]]></Dependencies>
+  </ModelInfo>
+</PythonJobModel>
