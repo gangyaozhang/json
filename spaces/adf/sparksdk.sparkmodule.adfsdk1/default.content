@@ -1,6 +1,6 @@
 <SparkModuleModel description="this is a adf sdk model test" name="adfsdk1" is_init="false">
   <ModelInfo validated="true">
-    <Module><![CDATA[{"desc":"this is a adf sdk model test","icon":"","version":"","backupDir":"","components":""}]]></Module>
+    <Module><![CDATA[{"desc":"this is a adf sdk model test","icon":"","version":"1.0","backupDir":"","components":""}]]></Module>
     <Files><![CDATA[[]]]></Files>
     <Blocks>
       <Block name="MyBlock" label="MyBlock"  enabled="true">
@@ -9,6 +9,8 @@
         <Controller>
         </Controller>
         <Generator type="undefined">
+          <Enrichment>
+          </Enrichment>
           <Template>
           </Template>
         </Generator>
