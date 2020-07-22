@@ -1,0 +1,14 @@
+{
+  "contents": [{
+    "fileref": "ModelContentFile0",
+    "name": "default"
+  }],
+  "lastDate": "1595292390043",
+  "owner": "vtbaadmin",
+  "properties": {
+    "_RESOURCE_Description": " ",
+    "_RESOURCE_Type": "dbpm",
+    "modelStatus": "valid",
+    "name": "VIA - File Service"
+  }
+}
